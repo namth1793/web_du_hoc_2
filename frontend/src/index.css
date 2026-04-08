@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body { font-family: 'Be Vietnam Pro', Arial, sans-serif; }
+  h1, h2, h3, h4, h5 { font-weight: 700; }
+}
+
+@layer components {
+  /* HAVICO-style section labels */
+  .section-label {
+    @apply inline-block bg-havico-blue text-white text-xs font-bold px-4 py-2 uppercase tracking-wider mb-5;
+  }
+  .section-label-orange {
+    @apply inline-block text-white text-xs font-bold px-4 py-2 uppercase tracking-wider mb-5;
+    background-color: #E65100;
+  }
+  /* Legacy - used in admin/article pages */
+  .section-title {
+    @apply text-xl font-bold uppercase tracking-wide text-navy-900 border-l-4 border-havico-blue pl-3 mb-4;
+  }
+  .section-title-center {
+    @apply text-2xl font-bold uppercase text-navy-900 text-center mb-2;
+  }
+  .section-underline {
+    @apply w-16 h-1 bg-havico-blue mx-auto mb-6;
+  }
+  .btn-primary {
+    @apply bg-havico-blue text-white px-5 py-2 font-semibold hover:bg-blue-700 transition-colors text-sm;
+  }
+  .btn-gold {
+    @apply bg-gold text-white px-6 py-3 font-bold hover:bg-amber-500 transition-colors;
+  }
+  .card-hover {
+    @apply hover:shadow-lg transition-shadow duration-300;
+  }
+  .article-content h2 {
+    @apply text-xl font-bold text-navy-900 mt-6 mb-3;
+  }
+  .article-content h3 {
+    @apply text-lg font-semibold text-navy-800 mt-5 mb-2;
+  }
+  .article-content p {
+    @apply text-gray-700 leading-relaxed mb-4;
+  }
+  .article-content ul, .article-content ol {
+    @apply pl-5 mb-4 space-y-1;
+  }
+  .article-content li {
+    @apply text-gray-700 list-disc;
+  }
+  .article-content ol li {
+    @apply list-decimal;
+  }
+  .article-content strong {
+    @apply font-semibold text-navy-900;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* Dropdown animation */
+.dropdown-menu {
+  transform-origin: top;
+  animation: dropIn 0.2s ease;
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
