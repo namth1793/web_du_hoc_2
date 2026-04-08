@@ -9,7 +9,7 @@
 # IMPORTANT: Replace the URL below with your actual Railway URL after deploying backend
 [[redirects]]
   from = "/api/*"
-  to = "https://YOUR-APP.up.railway.app/api/:splat"
+  to = "https://webduhoc2-production.up.railway.app/api/:splat"
   status = 200
   force = true
 
