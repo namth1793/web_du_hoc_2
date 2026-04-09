@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
+import Underline from '@tiptap/extension-underline';
+import Placeholder from '@tiptap/extension-placeholder';
 
 const AUTH = { headers: { Authorization: 'Bearer havico-admin-2025' } };
 
@@ -20,6 +27,82 @@ const EMPTY_FORM = { title: '', section: 'du-hoc', subcategory: 'nhat-ban', cove
 function formatDate(s) {
   if (!s) return '';
   return new Date(s).toLocaleDateString('vi-VN');
+}
+
+// ─── RichEditor ──────────────────────────────────────────────────────────────
+const ToolBtn = ({ onClick, active, title, children }) => (
+  <button type="button" onMouseDown={e => { e.preventDefault(); onClick(); }}
+    title={title}
+    className={`px-2 py-1 text-sm rounded transition-colors ${active ? 'bg-havico-blue text-white' : 'text-gray-700 hover:bg-gray-200'}`}>
+    {children}
+  </button>
+);
+
+function RichEditor({ value, onChange }) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Image.configure({ inline: false, allowBase64: false }),
+      Link.configure({ openOnClick: false }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      Placeholder.configure({ placeholder: 'Nhập nội dung bài viết tại đây...' }),
+    ],
+    content: value || '',
+    onUpdate: ({ editor }) => onChange(editor.getHTML()),
+  });
+
+  // Sync khi form reset (edit→new)
+  useEffect(() => {
+    if (!editor) return;
+    if (editor.getHTML() !== value) {
+      editor.commands.setContent(value || '', false);
+    }
+  }, [value, editor]);
+
+  const addImage = () => {
+    const url = window.prompt('Nhập URL ảnh:');
+    if (url) editor.chain().focus().setImage({ src: url }).run();
+  };
+
+  const setLink = () => {
+    const prev = editor.getAttributes('link').href || '';
+    const url = window.prompt('Nhập URL liên kết:', prev);
+    if (url === null) return;
+    if (url === '') { editor.chain().focus().unsetLink().run(); return; }
+    editor.chain().focus().setLink({ href: url, target: '_blank' }).run();
+  };
+
+  if (!editor) return null;
+
+  return (
+    <div className="tiptap-editor border border-gray-300 focus-within:border-havico-blue rounded overflow-hidden">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-gray-200 bg-gray-50">
+        <ToolBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Đậm"><strong>B</strong></ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="Nghiêng"><em>I</em></ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive('underline')} title="Gạch chân"><u>U</u></ToolBtn>
+        <div className="w-px h-5 bg-gray-300 mx-1" />
+        <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title="Tiêu đề lớn">H2</ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} title="Tiêu đề nhỏ">H3</ToolBtn>
+        <div className="w-px h-5 bg-gray-300 mx-1" />
+        <ToolBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Danh sách chấm">• —</ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Danh sách số">1.</ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Trích dẫn">"</ToolBtn>
+        <div className="w-px h-5 bg-gray-300 mx-1" />
+        <ToolBtn onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title="Căn trái">≡L</ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="Căn giữa">≡C</ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title="Căn phải">≡R</ToolBtn>
+        <div className="w-px h-5 bg-gray-300 mx-1" />
+        <ToolBtn onClick={setLink} active={editor.isActive('link')} title="Chèn liên kết">🔗</ToolBtn>
+        <ToolBtn onClick={addImage} active={false} title="Chèn ảnh qua URL">🖼</ToolBtn>
+        <div className="w-px h-5 bg-gray-300 mx-1" />
+        <ToolBtn onClick={() => editor.chain().focus().undo().run()} active={false} title="Hoàn tác">↩</ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().redo().run()} active={false} title="Làm lại">↪</ToolBtn>
+      </div>
+      <EditorContent editor={editor} />
+    </div>
+  );
 }
 
 // ─── ImageUpload ─────────────────────────────────────────────────────────────
@@ -135,7 +218,6 @@ function ArticleForm({ initial, sectionInfo, onSave, onCancel }) {
     subcategory: sectionInfo?.subcategory || 'nhat-ban',
   });
   const [saving, setSaving] = useState(false);
-  const [preview, setPreview] = useState(false);
   const setF = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const submit = async () => {
@@ -190,23 +272,10 @@ function ArticleForm({ initial, sectionInfo, onSave, onCancel }) {
             placeholder="Tóm tắt ngắn gọn về nội dung bài..." />
         </div>
 
-        {/* Content with preview toggle */}
+        {/* Content - Rich Text Editor */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-semibold text-gray-600">Nội dung (HTML)</label>
-            <button onClick={() => setPreview(p => !p)}
-              className="text-xs text-havico-blue hover:underline font-medium">
-              {preview ? '⌨️ Chỉnh sửa' : '👁 Xem trước'}
-            </button>
-          </div>
-          {preview ? (
-            <div className="border border-gray-200 p-4 min-h-[200px] article-content text-sm overflow-auto bg-gray-50"
-              dangerouslySetInnerHTML={{ __html: form.content }} />
-          ) : (
-            <textarea value={form.content} onChange={e => setF('content', e.target.value)} rows={12}
-              className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue resize-y font-mono"
-              placeholder="<h2>Tiêu đề phần</h2>&#10;<p>Nội dung...</p>&#10;<ul><li>Mục 1</li></ul>" />
-          )}
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Nội dung bài viết</label>
+          <RichEditor value={form.content} onChange={val => setF('content', val)} />
         </div>
 
         {/* Status */}
@@ -333,7 +402,10 @@ function SectionPanel({ sectionInfo, allArticles, onReload }) {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-3 justify-center">
-                      <button onClick={() => setEditing(a)} className="text-xs text-havico-blue hover:underline font-semibold">Sửa</button>
+                      <button onClick={async () => {
+                        const res = await axios.get(`/api/articles/${a.id}`);
+                        setEditing(res.data);
+                      }} className="text-xs text-havico-blue hover:underline font-semibold">Sửa</button>
                       <button onClick={() => del(a.id)} className="text-xs text-red-500 hover:underline font-semibold">Xóa</button>
                     </div>
                   </td>
