@@ -1,9 +1,27 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Chỉ chấp nhận file ảnh'));
+  },
+});
 
 const app = express();
 const PORT = process.env.PORT || 5020;
@@ -35,7 +53,30 @@ db.exec(`
     name TEXT, phone TEXT, email TEXT, province TEXT, message TEXT,
     created_at TEXT DEFAULT (datetime('now','localtime'))
   );
+
+  CREATE TABLE IF NOT EXISTS site_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL DEFAULT ''
+  );
 `);
+
+// ─── SEED SETTINGS ───────────────────────────────────────────────────────────
+const DEFAULT_SLIDES = JSON.stringify([
+  { src: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1920&q=80', label: '🇯🇵 Du học Nhật Bản', bg: '#1565C0' },
+  { src: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1920&q=80',    label: '🇯🇵 Cuộc sống tại Nhật Bản', bg: '#0d47a1' },
+  { src: 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=1920&q=80', label: '🇰🇷 Du học Hàn Quốc', bg: '#1a237e' },
+  { src: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1920&q=80', label: '🇩🇪 Du học Đức', bg: '#1b5e20' },
+  { src: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1920&q=80', label: '🇸🇬 Du học Singapore', bg: '#b71c1c' },
+]);
+const DEFAULT_SETTINGS = {
+  hero_slides:     DEFAULT_SLIDES,
+  about_youtube_id: 'dQw4w9WgXcQ',
+  about_thumbnail:  'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80',
+  about_text1: 'Công ty Cổ phần Đầu tư và Phát triển Thương mại Việt Phát (VTI) là doanh nghiệp hoạt động trong lĩnh vực tư vấn du học, với thị trường chiến lược là Nhật Bản. VTI làm việc trực tiếp với các trường mà không qua trung gian, giúp học viên có chi phí thấp nhất và dịch vụ tốt nhất.',
+  about_text2: 'Ngoài ra, VTI tặng miễn phí khóa học tiếng Nhật cấp tốc cho tất cả học viên đăng ký du học Nhật Bản. Đội ngũ tư vấn nhiệt tình, hỗ trợ toàn diện từ lúc chọn trường đến khi ổn định cuộc sống tại nước ngoài.',
+};
+const insertSetting = db.prepare('INSERT OR IGNORE INTO site_settings (key, value) VALUES (?, ?)');
+Object.entries(DEFAULT_SETTINGS).forEach(([k, v]) => insertSetting.run(k, v));
 
 // ─── SEED ────────────────────────────────────────────────────────────────────
 const count = db.prepare('SELECT COUNT(*) as c FROM articles').get().c;
@@ -340,6 +381,24 @@ function authAdmin(req, res, next) {
   res.status(401).json({ error: 'Unauthorized' });
 }
 
+// ─── UPLOAD ───────────────────────────────────────────────────────────────────
+app.post('/api/admin/upload', authAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Không có file' });
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'vietphat-vti', resource_type: 'image' },
+        (err, result) => err ? reject(err) : resolve(result)
+      );
+      stream.end(req.file.buffer);
+    });
+    res.json({ url: result.secure_url });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: 'Upload thất bại: ' + err.message });
+  }
+});
+
 // ─── ARTICLES ─────────────────────────────────────────────────────────────────
 app.get('/api/articles', (req, res) => {
   const { section, subcategory, limit = 20, page = 1 } = req.query;
@@ -410,6 +469,23 @@ app.post('/api/contacts', (req, res) => {
 app.get('/api/admin/contacts', authAdmin, (req, res) => {
   const rows = db.prepare('SELECT * FROM contacts ORDER BY created_at DESC').all();
   res.json(rows);
+});
+
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+app.get('/api/settings', (req, res) => {
+  const rows = db.prepare('SELECT key, value FROM site_settings').all();
+  const obj = {};
+  rows.forEach(r => { obj[r.key] = r.value; });
+  res.json(obj);
+});
+
+app.put('/api/admin/settings', authAdmin, (req, res) => {
+  const upsert = db.prepare('INSERT INTO site_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value');
+  const updates = db.transaction((data) => {
+    Object.entries(data).forEach(([k, v]) => upsert.run(k, String(v)));
+  });
+  updates(req.body);
+  res.json({ ok: true });
 });
 
 // ─── START ─────────────────────────────────────────────────────────────────────

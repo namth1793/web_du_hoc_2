@@ -4,14 +4,15 @@ import axios from 'axios';
 const AUTH = { headers: { Authorization: 'Bearer havico-admin-2025' } };
 
 const NAV_SECTIONS = [
-  { key: 'nhat-ban',  section: 'du-hoc', subcategory: 'nhat-ban',  label: 'Du học Nhật Bản',  icon: '🇯🇵' },
-  { key: 'han-quoc',  section: 'du-hoc', subcategory: 'han-quoc',  label: 'Du học Hàn Quốc',  icon: '🇰🇷' },
-  { key: 'nghe-duc',  section: 'du-hoc', subcategory: 'nghe-duc',  label: 'Du học Đức',        icon: '🇩🇪' },
-  { key: 'singapore', section: 'du-hoc', subcategory: 'singapore', label: 'Du học Singapore',  icon: '🇸🇬' },
-  { key: 'dai-loan',  section: 'du-hoc', subcategory: 'dai-loan',  label: 'Du học Đài Loan',   icon: '🇹🇼' },
-  { key: 'uc',        section: 'du-hoc', subcategory: 'uc',        label: 'Du học Úc',         icon: '🇦🇺' },
-  { key: 'su-kien',   section: 'su-kien', subcategory: 'su-kien',  label: 'Sự kiện',           icon: '🎪' },
-  { key: 'tin-tuc',   section: 'tin-tuc', subcategory: 'tin-tuc',  label: 'Tin tức',           icon: '📰' },
+  { key: 'gioi-thieu', section: null, subcategory: null, label: 'Giới thiệu & Carousel', icon: '🏠' },
+  { key: 'nhat-ban',   section: 'du-hoc', subcategory: 'nhat-ban',  label: 'Du học Nhật Bản',  icon: '🇯🇵' },
+  { key: 'han-quoc',   section: 'du-hoc', subcategory: 'han-quoc',  label: 'Du học Hàn Quốc',  icon: '🇰🇷' },
+  { key: 'nghe-duc',   section: 'du-hoc', subcategory: 'nghe-duc',  label: 'Du học Đức',        icon: '🇩🇪' },
+  { key: 'singapore',  section: 'du-hoc', subcategory: 'singapore', label: 'Du học Singapore',  icon: '🇸🇬' },
+  { key: 'dai-loan',   section: 'du-hoc', subcategory: 'dai-loan',  label: 'Du học Đài Loan',   icon: '🇹🇼' },
+  { key: 'uc',         section: 'du-hoc', subcategory: 'uc',        label: 'Du học Úc',         icon: '🇦🇺' },
+  { key: 'su-kien',    section: 'su-kien', subcategory: 'su-kien',  label: 'Sự kiện',           icon: '🎪' },
+  { key: 'tin-tuc',    section: 'tin-tuc', subcategory: 'tin-tuc',  label: 'Tin tức',           icon: '📰' },
 ];
 
 const EMPTY_FORM = { title: '', section: 'du-hoc', subcategory: 'nhat-ban', cover_image: '', excerpt: '', content: '', is_published: 1 };
@@ -19,6 +20,74 @@ const EMPTY_FORM = { title: '', section: 'du-hoc', subcategory: 'nhat-ban', cove
 function formatDate(s) {
   if (!s) return '';
   return new Date(s).toLocaleDateString('vi-VN');
+}
+
+// ─── ImageUpload ─────────────────────────────────────────────────────────────
+function ImageUpload({ value, onChange }) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError('');
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await axios.post('/api/admin/upload', fd, {
+        headers: { ...AUTH.headers, 'Content-Type': 'multipart/form-data' },
+      });
+      onChange(res.data.url);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Upload thất bại');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      {/* Preview */}
+      {value && (
+        <div className="relative inline-block">
+          <img src={value} alt="preview" className="h-32 w-auto object-cover border border-gray-200 rounded" />
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+          >✕</button>
+        </div>
+      )}
+
+      {/* Upload button */}
+      <label className={`flex items-center gap-2 cursor-pointer w-fit px-3 py-2 border text-sm rounded transition-colors ${
+        uploading ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                  : 'bg-white border-gray-300 hover:border-havico-blue hover:text-havico-blue'
+      }`}>
+        {uploading ? (
+          <>
+            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+            Đang upload...
+          </>
+        ) : (
+          <>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+            </svg>
+            {value ? 'Đổi ảnh' : 'Tải ảnh lên'}
+          </>
+        )}
+        <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleFile} />
+      </label>
+
+      {error && <p className="text-red-500 text-xs">{error}</p>}
+    </div>
+  );
 }
 
 // ─── Login ──────────────────────────────────────────────────────────────────
@@ -108,17 +177,10 @@ function ArticleForm({ initial, sectionInfo, onSave, onCancel }) {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Ảnh bìa (URL)</label>
-            <input value={form.cover_image} onChange={e => setF('cover_image', e.target.value)}
-              className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue"
-              placeholder="https://images.unsplash.com/..." />
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Ảnh bìa</label>
+            <ImageUpload value={form.cover_image} onChange={url => setF('cover_image', url)} />
           </div>
         </div>
-
-        {/* Preview image */}
-        {form.cover_image && (
-          <img src={form.cover_image} alt="preview" className="h-32 object-cover border border-gray-200" onError={e => e.target.style.display='none'} />
-        )}
 
         {/* Excerpt */}
         <div>
@@ -285,6 +347,146 @@ function SectionPanel({ sectionInfo, allArticles, onReload }) {
   );
 }
 
+// ─── Gioi Thieu Panel ────────────────────────────────────────────────────────
+function GioiThieuPanel() {
+  const [cfg, setCfg] = useState(null);
+  const [slides, setSlides] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    axios.get('/api/settings').then(r => {
+      setCfg(r.data);
+      try { setSlides(JSON.parse(r.data.hero_slides || '[]')); } catch { setSlides([]); }
+    });
+  }, []);
+
+  const save = async () => {
+    setSaving(true); setMsg('');
+    try {
+      await axios.put('/api/admin/settings', {
+        ...cfg,
+        hero_slides: JSON.stringify(slides),
+      }, AUTH);
+      setMsg('✓ Đã lưu thành công!');
+    } catch { setMsg('✗ Lưu thất bại'); }
+    finally { setSaving(false); }
+  };
+
+  const updateSlide = (i, field, val) =>
+    setSlides(s => s.map((sl, idx) => idx === i ? { ...sl, [field]: val } : sl));
+
+  const removeSlide = (i) => setSlides(s => s.filter((_, idx) => idx !== i));
+
+  const moveSlide = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= slides.length) return;
+    setSlides(s => { const a = [...s]; [a[i], a[j]] = [a[j], a[i]]; return a; });
+  };
+
+  const addSlide = () => setSlides(s => [...s, { src: '', label: '', bg: '#1565C0' }]);
+
+  if (!cfg) return <div className="p-8 text-gray-400">Đang tải...</div>;
+
+  return (
+    <div className="max-w-3xl space-y-8">
+      <h2 className="text-lg font-bold text-gray-800 border-b pb-3">🏠 Giới thiệu & Carousel</h2>
+
+      {/* ── Hero Carousel ── */}
+      <section>
+        <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <span className="bg-havico-blue text-white text-xs px-2 py-0.5">HERO</span>
+          Ảnh carousel trang chủ
+        </h3>
+        <div className="space-y-3">
+          {slides.map((sl, i) => (
+            <div key={i} className="border border-gray-200 rounded p-3 bg-gray-50">
+              <div className="flex items-start gap-3">
+                {/* Thumbnail */}
+                <div className="w-20 h-14 flex-shrink-0 bg-gray-200 rounded overflow-hidden" style={{ backgroundColor: sl.bg }}>
+                  {sl.src && <img src={sl.src} alt="" className="w-full h-full object-cover" onError={e => e.target.style.display='none'} />}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <label className="text-xs text-gray-500">Label</label>
+                      <input value={sl.label} onChange={e => updateSlide(i, 'label', e.target.value)}
+                        className="w-full border border-gray-300 px-2 py-1 text-sm outline-none focus:border-havico-blue"
+                        placeholder="🇯🇵 Du học Nhật Bản" />
+                    </div>
+                    <div className="w-24">
+                      <label className="text-xs text-gray-500">Màu nền</label>
+                      <input type="color" value={sl.bg || '#1565C0'} onChange={e => updateSlide(i, 'bg', e.target.value)}
+                        className="w-full h-8 border border-gray-300 cursor-pointer" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">Ảnh</label>
+                    <ImageUpload value={sl.src} onChange={url => updateSlide(i, 'src', url)} />
+                  </div>
+                </div>
+                {/* Controls */}
+                <div className="flex flex-col gap-1">
+                  <button onClick={() => moveSlide(i, -1)} disabled={i === 0}
+                    className="px-2 py-1 text-xs bg-white border border-gray-300 hover:bg-gray-100 disabled:opacity-30">▲</button>
+                  <button onClick={() => moveSlide(i, 1)} disabled={i === slides.length - 1}
+                    className="px-2 py-1 text-xs bg-white border border-gray-300 hover:bg-gray-100 disabled:opacity-30">▼</button>
+                  <button onClick={() => removeSlide(i)}
+                    className="px-2 py-1 text-xs bg-red-50 border border-red-200 text-red-600 hover:bg-red-100">✕</button>
+                </div>
+              </div>
+            </div>
+          ))}
+          <button onClick={addSlide}
+            className="w-full border-2 border-dashed border-gray-300 py-2 text-sm text-gray-500 hover:border-havico-blue hover:text-havico-blue transition-colors rounded">
+            + Thêm slide
+          </button>
+        </div>
+      </section>
+
+      {/* ── About Section ── */}
+      <section>
+        <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <span className="bg-havico-blue text-white text-xs px-2 py-0.5">GIỚI THIỆU</span>
+          Nội dung section giới thiệu
+        </h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">YouTube Video ID</label>
+            <input value={cfg.about_youtube_id || ''} onChange={e => setCfg(c => ({ ...c, about_youtube_id: e.target.value }))}
+              className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue"
+              placeholder="dQw4w9WgXcQ" />
+            <p className="text-xs text-gray-400 mt-1">Ví dụ: https://youtube.com/watch?v=<strong>ABC123xyz</strong> → điền <strong>ABC123xyz</strong></p>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Ảnh thumbnail video</label>
+            <ImageUpload value={cfg.about_thumbnail || ''} onChange={url => setCfg(c => ({ ...c, about_thumbnail: url }))} />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Đoạn văn 1</label>
+            <textarea value={cfg.about_text1 || ''} onChange={e => setCfg(c => ({ ...c, about_text1: e.target.value }))}
+              rows={3} className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue resize-none" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Đoạn văn 2</label>
+            <textarea value={cfg.about_text2 || ''} onChange={e => setCfg(c => ({ ...c, about_text2: e.target.value }))}
+              rows={3} className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue resize-none" />
+          </div>
+        </div>
+      </section>
+
+      {/* Save */}
+      <div className="flex items-center gap-4 pt-2 border-t">
+        <button onClick={save} disabled={saving}
+          className="bg-havico-blue text-white px-6 py-2 text-sm font-semibold hover:bg-blue-800 disabled:opacity-60 transition-colors">
+          {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+        </button>
+        {msg && <span className={`text-sm ${msg.startsWith('✓') ? 'text-green-600' : 'text-red-500'}`}>{msg}</span>}
+      </div>
+    </div>
+  );
+}
+
 // ─── Contacts Panel ──────────────────────────────────────────────────────────
 function ContactsPanel({ contacts }) {
   return (
@@ -420,6 +622,8 @@ export default function Admin() {
         <main className="flex-1 overflow-y-auto p-6">
           {activeKey === 'contacts' ? (
             <ContactsPanel contacts={contacts} />
+          ) : activeKey === 'gioi-thieu' ? (
+            <GioiThieuPanel />
           ) : activeSectionInfo ? (
             <SectionPanel
               key={activeKey}
