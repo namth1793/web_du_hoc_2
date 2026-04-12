@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 
 const NAV_ITEMS = [
-  { label: 'Giới thiệu', href: '/#ve-vti' },
+  { label: 'Giới thiệu', href: '/gioi-thieu' },
   { label: 'Du học Nhật Bản', href: '/du-hoc/nhat-ban' },
   { label: 'Du học Hàn Quốc', href: '/du-hoc/han-quoc' },
   { label: 'Du học Đức', href: '/du-hoc/nghe-duc' },
@@ -30,10 +30,10 @@ export default function Navbar() {
 
       {/* Main Nav */}
       <nav className="bg-havico-blue shadow-md">
-        <div className="max-w-7xl mx-auto px-2 flex items-center h-20 gap-10">
+        <div className="max-w-7xl mx-auto px-3 sm:px-2 flex items-center h-16 sm:h-20 gap-4 sm:gap-10">
           {/* Logo */}
           <Link to="/" className="flex items-center mr-4 flex-shrink-0">
-            <img src={logo} alt="Việt Phát VTI" className="h-14 w-auto object-contain" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }} />
+            <img src={logo} alt="Việt Phát VTI" className="h-10 sm:h-14 w-auto object-contain" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }} />
           </Link>
 
           {/* Desktop Nav - flat links */}

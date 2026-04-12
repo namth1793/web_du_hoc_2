@@ -1,3 +1,7 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+
 const CERTS = [
   {
     img: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=400&q=80',
@@ -17,24 +21,6 @@ const CERTS = [
   },
 ];
 
-const SCHOOLS = [
-  {
-    img: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400&q=80',
-    name: 'Trường Nhật ngữ Tohoku Gaigo',
-    location: 'Sendai, Miyagi, Nhật Bản',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&q=80',
-    name: 'Trường Nhật ngữ Kamei Gakuen',
-    location: 'Osaka, Nhật Bản',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1562774053-701939374585?w=400&q=80',
-    name: 'Học viện Nhật ngữ GAG (ICAP)',
-    location: 'Osaka & các thành phố lớn, Nhật Bản',
-  },
-];
-
 const PROGRAMS = [
   { icon: '🎓', title: 'Tuyển sinh du học Nhật Bản', sub: 'Chương trình vừa học vừa làm' },
   { icon: '⚙️', title: 'Tuyển sinh du học kỹ sư', sub: 'Kỹ sư CNTT, Cơ khí, Điện tử' },
@@ -42,7 +28,81 @@ const PROGRAMS = [
   { icon: '🏥', title: 'Tuyển sinh du học Điều dưỡng', sub: 'Chương trình điều dưỡng tại Nhật Bản' },
 ];
 
+const VISIBLE = 4;
+
+function SchoolCarousel({ schools }) {
+  const [index, setIndex] = useState(0);
+  const [transitioning, setTransitioning] = useState(true);
+
+  // Clone first VISIBLE items to end for seamless loop
+  const items = [...schools, ...schools.slice(0, VISIBLE)];
+  const N = items.length; // e.g. 16
+
+  const advance = useCallback(() => {
+    setTransitioning(true);
+    setIndex(i => i + 1);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(advance, 2500);
+    return () => clearInterval(timer);
+  }, [advance]);
+
+  const handleTransitionEnd = () => {
+    if (index >= schools.length) {
+      setTransitioning(false);
+      setIndex(0);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setTransitioning(true));
+      });
+    }
+  };
+
+  // track width = N/VISIBLE * 100% of container; translateX per card = 100%/N of track
+  const translatePct = -(index * 100) / N;
+
+  return (
+    <div className="overflow-hidden">
+      <div
+        onTransitionEnd={handleTransitionEnd}
+        style={{
+          display: 'flex',
+          width: `${(N / VISIBLE) * 100}%`,
+          transform: `translateX(${translatePct}%)`,
+          transition: transitioning ? 'transform 0.5s ease-in-out' : 'none',
+        }}
+      >
+        {items.map((s, idx) => (
+          <div
+            key={`${s.id}-${idx}`}
+            style={{ width: `${100 / N}%`, flexShrink: 0, padding: '0 8px' }}
+          >
+            <Link to={`/truong-lien-ket/${s.slug}`}
+              className="bg-white border border-gray-200 group overflow-hidden hover:shadow-md hover:border-havico-blue transition-all block">
+              <div className="overflow-hidden h-[130px] sm:h-[150px]">
+                <img src={s.img} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-gray-800 text-xs leading-snug mb-1 line-clamp-2 group-hover:text-havico-blue transition-colors">
+                  {s.name}
+                </h3>
+                <p className="text-havico-blue text-[11px] font-medium">📍 {s.city}</p>
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Achievements() {
+  const [schools, setSchools] = useState([]);
+
+  useEffect(() => {
+    axios.get('/api/schools').then(r => setSchools(r.data)).catch(() => {});
+  }, []);
+
   return (
     <>
       {/* Uy tín được khẳng định */}
@@ -57,7 +117,7 @@ export default function Achievements() {
             {CERTS.map((c, i) => (
               <div key={i} className="text-center group">
                 <div className="overflow-hidden border border-gray-200 mb-2">
-                  <img src={c.img} alt={c.label} className="w-full object-cover group-hover:scale-105 transition-transform duration-500" style={{height:'160px'}}/>
+                  <img src={c.img} alt={c.label} className="w-full object-cover group-hover:scale-105 transition-transform duration-500 h-[110px] sm:h-[140px] md:h-[160px]"/>
                 </div>
                 <p className="text-xs text-gray-600 leading-snug">{c.label}</p>
               </div>
@@ -70,19 +130,21 @@ export default function Achievements() {
       <section id="truong-lien-ket" className="py-8 bg-gray-50 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4">
           <div className="section-label">Trường liên kết</div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {SCHOOLS.map((s, i) => (
-              <div key={i} className="bg-white border border-gray-200 group overflow-hidden">
-                <div className="overflow-hidden" style={{height:'160px'}}>
-                  <img src={s.img} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+          {schools.length === 0 ? (
+            <div className="flex gap-4">
+              {[1,2,3,4].map(i => (
+                <div key={i} className="flex-1 bg-white border border-gray-200 animate-pulse">
+                  <div className="h-[150px] bg-gray-200" />
+                  <div className="p-3 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-100 rounded w-1/2" />
+                  </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-800 text-sm mb-1">{s.name}</h3>
-                  <p className="text-havico-blue text-xs font-medium">📍 {s.location}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <SchoolCarousel schools={schools} />
+          )}
         </div>
       </section>
 

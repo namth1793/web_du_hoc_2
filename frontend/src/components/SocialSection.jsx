@@ -1,49 +1,11 @@
-const GALLERY = [
-  {
-    img: 'https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=600&q=80',
-    title: 'Ảnh du lịch Hạ Long 2019',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600&q=80',
-    title: 'Ảnh sinh nhật VTI Edu',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80',
-    title: 'Ảnh công tác',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=600&q=80',
-    title: 'Ảnh sinh nhật công ty',
-  },
-];
-
 export default function SocialSection() {
   return (
     <>
-      {/* Thư viện ảnh */}
-      <section className="py-8 bg-gray-50 border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="section-label">Thư viện ảnh</div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {GALLERY.map((item, i) => (
-              <div key={i} className="group relative overflow-hidden cursor-pointer border border-gray-200">
-                <img src={item.img} alt={item.title}
-                  className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  style={{height:'150px'}}/>
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-                  <p className="text-white text-xs font-semibold">{item.title}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Góc liên hệ */}
       <section className="py-8 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4">
           <div className="section-label">Góc liên hệ Việt Phát VTI</div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
             <a href="https://youtube.com" target="_blank" rel="noreferrer"
               className="bg-red-600 hover:bg-red-700 text-white py-8 text-center transition-colors flex flex-col items-center gap-3 group">
               <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">

@@ -37,7 +37,7 @@ export default function EventsGrid() {
             e ? (
               <Link key={e.id} to={`/bai-viet/${e.id}`}
                 className="group block overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-                <div className="relative overflow-hidden" style={{height:'160px'}}>
+                <div className="relative overflow-hidden h-[140px] sm:h-[160px]">
                   {e.cover_image
                     ? <img src={e.cover_image} alt={e.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
                     : <div className="w-full h-full bg-blue-100 flex items-center justify-center text-4xl">🎪</div>
@@ -53,7 +53,7 @@ export default function EventsGrid() {
                 </div>
               </Link>
             ) : (
-              <div key={i} className="bg-gray-100 animate-pulse" style={{height:'220px'}} />
+              <div key={i} className="bg-gray-100 animate-pulse h-[200px] sm:h-[220px]" />
             )
           ))}
         </div>

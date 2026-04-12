@@ -32,7 +32,6 @@ export default function Footer() {
             <ul className="space-y-2">
               {[
                 { label: 'Hoạt động Việt Phát VTI', href: '/su-kien' },
-                { label: 'Thư viện ảnh', href: '/su-kien' },
                 { label: 'Sự kiện du học', href: '/su-kien' },
                 { label: 'Tư vấn du học', href: '/tu-van' },
               ].map(l => (

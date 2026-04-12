@@ -45,8 +45,7 @@ export default function CountryCards() {
                 <img
                   src={c.img}
                   alt={c.name}
-                  className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  style={{ height: '180px' }}
+                  className="w-full object-cover group-hover:scale-105 transition-transform duration-500 h-[120px] sm:h-[150px] md:h-[180px]"
                 />
               </div>
               <Link to={`/du-hoc/${c.slug}`}

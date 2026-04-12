@@ -48,7 +48,7 @@ export default function Hero() {
   if (slides.length === 0) return null;
 
   return (
-    <div className="relative w-full overflow-hidden select-none" style={{ height: '420px' }}>
+    <div className="relative w-full overflow-hidden select-none h-[200px] sm:h-[280px] md:h-[360px] lg:h-[420px]">
       <div
         className="flex h-full"
         style={{
@@ -74,9 +74,9 @@ export default function Hero() {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
             {s.label && (
-              <div className="absolute bottom-12 left-8 text-white z-10">
-                <p className="text-2xl font-bold drop-shadow-lg">{s.label}</p>
-                <p className="text-sm text-white/80 mt-1">Việt Phát VTI – Tư vấn du học miễn phí</p>
+              <div className="absolute bottom-8 left-4 sm:bottom-10 sm:left-8 text-white z-10">
+                <p className="text-base sm:text-xl md:text-2xl font-bold drop-shadow-lg">{s.label}</p>
+                <p className="text-xs sm:text-sm text-white/80 mt-0.5 sm:mt-1">Việt Phát VTI – Tư vấn du học miễn phí</p>
               </div>
             )}
           </div>

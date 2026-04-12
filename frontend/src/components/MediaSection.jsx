@@ -1,10 +1,13 @@
+import ACB from '../../assets/partner/ACB.jpg';
+import BIDV from '../../assets/partner/bidv.jpg';
+import Techcombank from '../../assets/partner/techcombank.jpg';
+import Vingroup from '../../assets/partner/vingroup.jpg';
+
 const PARTNERS = [
-  { name: 'BIDV', color: '#005DAA', abbr: 'BIDV' },
-  { name: 'ACB', color: '#0066CC', abbr: 'ACB' },
-  { name: 'Vingroup', color: '#0F4F9E', abbr: 'Vingroup' },
-  { name: 'Dân Trí', color: '#e2000b', abbr: 'DÂN TRÍ' },
-  { name: 'VnExpress', color: '#006699', abbr: 'VnExpress' },
-  { name: 'VOV', color: '#cc0000', abbr: 'VOV' },
+  { name: 'ACB', img: ACB },
+  { name: 'BIDV', img: BIDV },
+  { name: 'Techcombank', img: Techcombank },
+  { name: 'Vingroup', img: Vingroup },
 ];
 
 export default function MediaSection() {
@@ -13,10 +16,10 @@ export default function MediaSection() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="section-label">Báo chí &amp; Đối tác</div>
         <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
-          {PARTNERS.map(m => (
-            <div key={m.name}
-              className="w-28 h-16 border border-gray-200 flex items-center justify-center hover:border-havico-blue hover:shadow-sm transition-all cursor-pointer">
-              <span className="text-sm font-black tracking-tight" style={{ color: m.color }}>{m.abbr}</span>
+          {PARTNERS.map(p => (
+            <div key={p.name}
+              className="w-44 h-24 border border-gray-200 flex items-center justify-center hover:border-havico-blue hover:shadow-sm transition-all overflow-hidden">
+              <img src={p.img} alt={p.name} className="max-w-full max-h-full object-contain" />
             </div>
           ))}
         </div>

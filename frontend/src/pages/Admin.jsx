@@ -250,7 +250,7 @@ function ArticleForm({ initial, sectionInfo, onSave, onCancel }) {
             placeholder="Nhập tiêu đề bài viết..." />
         </div>
 
-        {/* Section info */}
+        {/* Section info + date */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Chuyên mục</label>
@@ -259,9 +259,18 @@ function ArticleForm({ initial, sectionInfo, onSave, onCancel }) {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Ảnh bìa</label>
-            <ImageUpload value={form.cover_image} onChange={url => setF('cover_image', url)} />
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Ngày đăng</label>
+            <input
+              type="datetime-local"
+              value={form.published_at ? form.published_at.slice(0, 16).replace(' ', 'T') : ''}
+              onChange={e => setF('published_at', e.target.value.replace('T', ' '))}
+              className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue"
+            />
           </div>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Ảnh bìa</label>
+          <ImageUpload value={form.cover_image} onChange={url => setF('cover_image', url)} />
         </div>
 
         {/* Excerpt */}
@@ -559,6 +568,466 @@ function GioiThieuPanel() {
   );
 }
 
+// ─── Testimonials Panel ──────────────────────────────────────────────────────
+const EMPTY_T = { name: '', role: '', avatar: '', country: '', content: '', sort_order: 0, is_published: 1 };
+
+function TestimonialsPanel() {
+  const [list, setList] = useState([]);
+  const [editing, setEditing] = useState(null); // null=list, object=edit/new
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState('');
+
+  const load = () => axios.get('/api/admin/testimonials', AUTH).then(r => setList(r.data)).catch(() => {});
+  useEffect(() => { load(); }, []);
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+
+  const save = async () => {
+    if (!editing.name.trim() || !editing.content.trim()) return alert('Vui lòng nhập tên và nội dung!');
+    setSaving(true);
+    try {
+      if (editing.id) await axios.put(`/api/admin/testimonials/${editing.id}`, editing, AUTH);
+      else await axios.post('/api/admin/testimonials', editing, AUTH);
+      setEditing(null); load(); showToast('Đã lưu ý kiến học viên!');
+    } catch { alert('Lỗi khi lưu.'); }
+    setSaving(false);
+  };
+
+  const del = async (id) => {
+    if (!window.confirm('Xóa ý kiến này?')) return;
+    await axios.delete(`/api/admin/testimonials/${id}`, AUTH);
+    load(); showToast('Đã xóa.');
+  };
+
+  const toggle = async (t) => {
+    await axios.put(`/api/admin/testimonials/${t.id}`, { ...t, is_published: t.is_published ? 0 : 1 }, AUTH);
+    load();
+  };
+
+  const setF = (k, v) => setEditing(f => ({ ...f, [k]: v }));
+
+  if (editing) {
+    return (
+      <div>
+        {toast && <div className="bg-green-100 text-green-800 px-4 py-2 text-sm font-medium mb-4 border border-green-200">{toast}</div>}
+        <div className="bg-white border border-gray-200">
+          <div className="bg-gray-50 border-b border-gray-200 px-5 py-3 flex items-center justify-between">
+            <h3 className="font-bold text-gray-800 text-sm">
+              {editing.id ? `✏️ Sửa ý kiến #${editing.id}` : '➕ Thêm ý kiến học viên'}
+            </h3>
+            <button onClick={() => setEditing(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+          </div>
+          <div className="p-5 space-y-4 max-w-2xl">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Họ tên *</label>
+                <input value={editing.name} onChange={e => setF('name', e.target.value)}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue"
+                  placeholder="Nguyễn Thị Lan" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Vai trò</label>
+                <input value={editing.role} onChange={e => setF('role', e.target.value)}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue"
+                  placeholder="Du học sinh Nhật Bản" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Cờ quốc gia (emoji)</label>
+                <input value={editing.country} onChange={e => setF('country', e.target.value)}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue"
+                  placeholder="🇯🇵" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Thứ tự hiển thị</label>
+                <input type="number" value={editing.sort_order} onChange={e => setF('sort_order', Number(e.target.value))}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Ảnh đại diện</label>
+              <ImageUpload value={editing.avatar} onChange={url => setF('avatar', url)} />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Nội dung ý kiến *</label>
+              <textarea value={editing.content} onChange={e => setF('content', e.target.value)} rows={4}
+                className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue resize-none"
+                placeholder="Nhập nội dung ý kiến của học viên..." />
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-semibold text-gray-600">Trạng thái:</label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={!!editing.is_published} onChange={e => setF('is_published', e.target.checked ? 1 : 0)} />
+                <span className={`text-xs font-bold ${editing.is_published ? 'text-green-600' : 'text-gray-400'}`}>
+                  {editing.is_published ? '✓ Hiển thị' : '○ Ẩn'}
+                </span>
+              </label>
+            </div>
+            <div className="flex gap-3 pt-2 border-t border-gray-100">
+              <button onClick={save} disabled={saving}
+                className="bg-havico-blue text-white px-6 py-2 text-sm font-bold hover:bg-blue-700 transition-colors disabled:opacity-60">
+                {saving ? 'Đang lưu...' : (editing.id ? '💾 Cập nhật' : '➕ Thêm mới')}
+              </button>
+              <button onClick={() => setEditing(null)}
+                className="px-4 py-2 text-sm border border-gray-300 hover:bg-gray-50 text-gray-600">Hủy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {toast && <div className="bg-green-100 text-green-800 px-4 py-2 text-sm font-medium mb-4 border border-green-200">{toast}</div>}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="font-bold text-gray-800 text-base">⭐ Ý kiến học viên</h2>
+          <p className="text-xs text-gray-400 mt-0.5">{list.length} ý kiến</p>
+        </div>
+        <button onClick={() => setEditing({ ...EMPTY_T })}
+          className="bg-havico-blue text-white px-4 py-2 text-xs font-bold hover:bg-blue-700 transition-colors flex items-center gap-1.5">
+          <span className="text-base leading-none">+</span> Thêm ý kiến
+        </button>
+      </div>
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        {list.length === 0 ? (
+          <div className="py-12 text-center text-gray-400 text-sm">Chưa có ý kiến nào</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-500 uppercase">Học viên</th>
+                <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-500 uppercase">Nội dung</th>
+                <th className="px-4 py-2.5 text-center text-xs font-bold text-gray-500 uppercase w-20">Trạng thái</th>
+                <th className="px-4 py-2.5 text-center text-xs font-bold text-gray-500 uppercase w-28">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {list.map(t => (
+                <tr key={t.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      {t.avatar
+                        ? <img src={t.avatar} alt={t.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                        : <div className="w-8 h-8 rounded-full bg-havico-blue flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{t.name.charAt(0)}</div>
+                      }
+                      <div>
+                        <div className="text-xs font-semibold text-gray-800">{t.name} {t.country}</div>
+                        <div className="text-xs text-gray-400">{t.role}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-600 max-w-xs">
+                    <span className="line-clamp-2">"{t.content}"</span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <button onClick={() => toggle(t)}
+                      className={`text-[10px] font-bold px-2.5 py-1 transition-colors ${
+                        t.is_published ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                      }`}>
+                      {t.is_published ? '● Hiện' : '○ Ẩn'}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-3 justify-center">
+                      <button onClick={() => setEditing({ ...t })} className="text-xs text-havico-blue hover:underline font-semibold">Sửa</button>
+                      <button onClick={() => del(t.id)} className="text-xs text-red-500 hover:underline font-semibold">Xóa</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Schools Panel ───────────────────────────────────────────────────────────
+function SchoolsPanel() {
+  const [list, setList] = useState([]);
+  const [editing, setEditing] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState('');
+  const [uploading, setUploading] = useState(false);
+
+  const load = () => axios.get('/api/admin/schools', AUTH).then(r => setList(r.data)).catch(() => {});
+  useEffect(() => { load(); }, []);
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+
+  const save = async () => {
+    if (!editing.name?.trim()) return alert('Vui lòng nhập tên trường!');
+    setSaving(true);
+    try {
+      await axios.put(`/api/admin/schools/${editing.id}`, editing, AUTH);
+      setEditing(null); load(); showToast('Đã lưu thông tin trường!');
+    } catch { alert('Lỗi khi lưu.'); }
+    setSaving(false);
+  };
+
+  const setF = (k, v) => setEditing(f => ({ ...f, [k]: v }));
+
+  // Helpers for dynamic arrays
+  const addIntro = () => setF('intro', [...(editing.intro || []), '']);
+  const updateIntro = (i, v) => setF('intro', editing.intro.map((p, idx) => idx === i ? v : p));
+  const removeIntro = (i) => setF('intro', editing.intro.filter((_, idx) => idx !== i));
+
+  const addHighlight = () => setF('highlights', [...(editing.highlights || []), { title: '', content: '' }]);
+  const updateHighlight = (i, field, v) => setF('highlights', editing.highlights.map((h, idx) => idx === i ? { ...h, [field]: v } : h));
+  const removeHighlight = (i) => setF('highlights', editing.highlights.filter((_, idx) => idx !== i));
+
+  const addTuitionRow = () => setF('tuition_rows', [...(editing.tuition_rows || []), { label: '', value: '', note: '', highlight: false }]);
+  const updateTuitionRow = (i, field, v) => setF('tuition_rows', editing.tuition_rows.map((r, idx) => idx === i ? { ...r, [field]: v } : r));
+  const removeTuitionRow = (i) => setF('tuition_rows', editing.tuition_rows.filter((_, idx) => idx !== i));
+
+  const uploadCert = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await axios.post('/api/admin/upload', fd, {
+        headers: { ...AUTH.headers, 'Content-Type': 'multipart/form-data' },
+      });
+      setF('cert_images', [...(editing.cert_images || []), res.data.url]);
+    } catch { alert('Upload thất bại'); }
+    setUploading(false);
+    e.target.value = '';
+  };
+
+  const removeCert = (i) => setF('cert_images', editing.cert_images.filter((_, idx) => idx !== i));
+
+  if (editing) {
+    return (
+      <div className="max-w-3xl">
+        {toast && <div className="bg-green-100 text-green-800 px-4 py-2 text-sm font-medium mb-4 border border-green-200">{toast}</div>}
+        <div className="bg-white border border-gray-200">
+          <div className="bg-gray-50 border-b border-gray-200 px-5 py-3 flex items-center justify-between">
+            <h3 className="font-bold text-gray-800 text-sm">✏️ Sửa: {editing.name}</h3>
+            <button onClick={() => setEditing(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+          </div>
+          <div className="p-5 space-y-6">
+
+            {/* Basic info */}
+            <div>
+              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Thông tin cơ bản</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Ảnh bìa trường</label>
+                  <ImageUpload value={editing.img || ''} onChange={url => setF('img', url)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Tên trường *</label>
+                    <input value={editing.name || ''} onChange={e => setF('name', e.target.value)}
+                      className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Tên ngắn</label>
+                    <input value={editing.short_name || ''} onChange={e => setF('short_name', e.target.value)}
+                      className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Thành phố</label>
+                    <input value={editing.city || ''} onChange={e => setF('city', e.target.value)}
+                      className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Quốc gia</label>
+                    <input value={editing.country || ''} onChange={e => setF('country', e.target.value)}
+                      className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Năm thành lập</label>
+                    <input type="number" value={editing.founded || ''} onChange={e => setF('founded', e.target.value ? Number(e.target.value) : null)}
+                      className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Intro */}
+            <div>
+              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Giới thiệu</h4>
+              <div className="space-y-2">
+                {(editing.intro || []).map((p, i) => (
+                  <div key={i} className="flex gap-2">
+                    <textarea value={p} onChange={e => updateIntro(i, e.target.value)} rows={3}
+                      className="flex-1 border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue resize-none"
+                      placeholder={`Đoạn ${i + 1}...`} />
+                    <button onClick={() => removeIntro(i)}
+                      className="text-red-400 hover:text-red-600 px-2 text-lg flex-shrink-0">✕</button>
+                  </div>
+                ))}
+                <button onClick={addIntro}
+                  className="text-xs text-havico-blue hover:underline font-semibold">+ Thêm đoạn</button>
+              </div>
+            </div>
+
+            {/* Tuition */}
+            <div>
+              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Học phí</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Ghi chú học phí</label>
+                  <textarea value={editing.tuition_note || ''} onChange={e => setF('tuition_note', e.target.value)} rows={3}
+                    className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue resize-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-2">Bảng học phí</label>
+                  <div className="space-y-2">
+                    {(editing.tuition_rows || []).map((r, i) => (
+                      <div key={i} className="flex gap-2 items-start">
+                        <input value={r.label} onChange={e => updateTuitionRow(i, 'label', e.target.value)}
+                          className="flex-1 border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-havico-blue"
+                          placeholder="Tên khoản phí" />
+                        <input value={r.value} onChange={e => updateTuitionRow(i, 'value', e.target.value)}
+                          className="w-36 border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-havico-blue"
+                          placeholder="Số tiền" />
+                        <input value={r.note} onChange={e => updateTuitionRow(i, 'note', e.target.value)}
+                          className="w-28 border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-havico-blue"
+                          placeholder="Ghi chú" />
+                        <label className="flex items-center gap-1 text-xs text-gray-600 pt-1.5 whitespace-nowrap">
+                          <input type="checkbox" checked={!!r.highlight} onChange={e => updateTuitionRow(i, 'highlight', e.target.checked)} />
+                          Nổi bật
+                        </label>
+                        <button onClick={() => removeTuitionRow(i)} className="text-red-400 hover:text-red-600 pt-1 text-lg">✕</button>
+                      </div>
+                    ))}
+                    <button onClick={addTuitionRow} className="text-xs text-havico-blue hover:underline font-semibold">+ Thêm dòng</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Highlights */}
+            <div>
+              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Điểm nổi bật</h4>
+              <div className="space-y-3">
+                {(editing.highlights || []).map((h, i) => (
+                  <div key={i} className="border border-gray-200 rounded p-3 space-y-2">
+                    <div className="flex gap-2 items-center">
+                      <input value={h.title} onChange={e => updateHighlight(i, 'title', e.target.value)}
+                        className="flex-1 border border-gray-300 px-2 py-1.5 text-xs font-semibold outline-none focus:border-havico-blue"
+                        placeholder="Tiêu đề điểm nổi bật" />
+                      <button onClick={() => removeHighlight(i)} className="text-red-400 hover:text-red-600 text-lg">✕</button>
+                    </div>
+                    <textarea value={h.content} onChange={e => updateHighlight(i, 'content', e.target.value)} rows={3}
+                      className="w-full border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-havico-blue resize-none"
+                      placeholder="Nội dung..." />
+                  </div>
+                ))}
+                <button onClick={addHighlight} className="text-xs text-havico-blue hover:underline font-semibold">+ Thêm điểm nổi bật</button>
+              </div>
+            </div>
+
+            {/* Cert Images */}
+            <div>
+              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Ảnh giấy chứng nhận</h4>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
+                {(editing.cert_images || []).map((url, i) => (
+                  <div key={i} className="relative group">
+                    <img src={url} alt="" className="w-full h-24 object-cover border border-gray-200 rounded" />
+                    <button onClick={() => removeCert(i)}
+                      className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <label className={`flex flex-col items-center justify-center h-24 border-2 border-dashed rounded cursor-pointer transition-colors ${uploading ? 'border-gray-200 text-gray-300 cursor-not-allowed' : 'border-gray-300 text-gray-400 hover:border-havico-blue hover:text-havico-blue'}`}>
+                  {uploading ? (
+                    <svg className="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                  ) : (
+                    <>
+                      <span className="text-2xl">+</span>
+                      <span className="text-xs mt-1">Tải ảnh lên</span>
+                    </>
+                  )}
+                  <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={uploadCert} />
+                </label>
+              </div>
+              <p className="text-xs text-gray-400">Ảnh chứng nhận sẽ hiển thị cuối trang chi tiết trường.</p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2 border-t border-gray-100">
+              <button onClick={save} disabled={saving}
+                className="bg-havico-blue text-white px-6 py-2 text-sm font-bold hover:bg-blue-700 transition-colors disabled:opacity-60">
+                {saving ? 'Đang lưu...' : '💾 Lưu thay đổi'}
+              </button>
+              <button onClick={() => setEditing(null)}
+                className="px-4 py-2 text-sm border border-gray-300 hover:bg-gray-50 text-gray-600">Hủy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {toast && <div className="bg-green-100 text-green-800 px-4 py-2 text-sm font-medium mb-4 border border-green-200">{toast}</div>}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="font-bold text-gray-800 text-base">🏫 Trường liên kết</h2>
+          <p className="text-xs text-gray-400 mt-0.5">{list.length} trường</p>
+        </div>
+      </div>
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        {list.length === 0 ? (
+          <div className="py-12 text-center text-gray-400 text-sm">Đang tải...</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-500 uppercase">Trường</th>
+                <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-500 uppercase w-32">Thành phố</th>
+                <th className="px-4 py-2.5 text-center text-xs font-bold text-gray-500 uppercase w-24">Ảnh CK</th>
+                <th className="px-4 py-2.5 text-center text-xs font-bold text-gray-500 uppercase w-20">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {list.map(s => (
+                <tr key={s.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      {s.img && <img src={s.img} alt="" className="w-12 h-8 object-cover rounded flex-shrink-0 border border-gray-200" />}
+                      <div>
+                        <div className="text-xs font-semibold text-gray-800 line-clamp-1">{s.name}</div>
+                        <div className="text-[10px] text-gray-400">{s.slug}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{s.city}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 ${(s.cert_images || []).length > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
+                      {(s.cert_images || []).length} ảnh
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <button onClick={() => setEditing({ ...s })}
+                      className="text-xs text-havico-blue hover:underline font-semibold">Sửa</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Contacts Panel ──────────────────────────────────────────────────────────
 function ContactsPanel({ contacts }) {
   return (
@@ -669,6 +1138,28 @@ export default function Admin() {
               ))}
 
               <div className="border-t border-gray-100 mt-2 pt-2">
+                <button onClick={() => setActiveKey('schools')}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                    activeKey === 'schools'
+                      ? 'bg-havico-blue text-white font-semibold'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}>
+                  <span className="flex items-center gap-2">
+                    <span>🏫</span>
+                    <span className="text-xs">Trường liên kết</span>
+                  </span>
+                </button>
+                <button onClick={() => setActiveKey('testimonials')}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                    activeKey === 'testimonials'
+                      ? 'bg-havico-blue text-white font-semibold'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}>
+                  <span className="flex items-center gap-2">
+                    <span>⭐</span>
+                    <span className="text-xs">Ý kiến học viên</span>
+                  </span>
+                </button>
                 <button onClick={() => setActiveKey('contacts')}
                   className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
                     activeKey === 'contacts'
@@ -694,6 +1185,10 @@ export default function Admin() {
         <main className="flex-1 overflow-y-auto p-6">
           {activeKey === 'contacts' ? (
             <ContactsPanel contacts={contacts} />
+          ) : activeKey === 'testimonials' ? (
+            <TestimonialsPanel />
+          ) : activeKey === 'schools' ? (
+            <SchoolsPanel />
           ) : activeKey === 'gioi-thieu' ? (
             <GioiThieuPanel />
           ) : activeSectionInfo ? (
