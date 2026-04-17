@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import intro1 from '../../assets/intro/intro1.jpg';
 import intro2 from '../../assets/intro/intro2.jpg';
 import intro3 from '../../assets/intro/intro3.jpg';
@@ -34,6 +35,11 @@ const BRANCHES = [
 
 export default function AboutSection() {
   const [activeTab, setActiveTab] = useState('about');
+  const [cfg, setCfg] = useState({ about_text1: '', about_text2: '' });
+
+  useEffect(() => {
+    axios.get('/api/settings').then(r => setCfg(r.data)).catch(() => {});
+  }, []);
 
   return (
     <section id="ve-vti" className="py-8 bg-white">
@@ -67,50 +73,39 @@ export default function AboutSection() {
         {/* Tab: Về Việt Phát VTI */}
         {activeTab === 'about' && (
           <div className="max-w-4xl">
-            <div className="text-sm text-gray-700 leading-relaxed space-y-4">
-              <p><strong>Kính gửi: Quý khách hàng</strong></p>
-
-              <p>
-                Lời đầu tiên, Công ty cổ phần đầu tư và Phát triển Thương mại Việt Phát xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến quý khách hàng!
-              </p>
-
-              <p>
-                Với mong muốn được thiết lập mối quan hệ hợp tác lâu dài với quý khách hàng, chúng tôi hân hạnh gửi thư này xin giới thiệu đôi nét về dịch vụ công ty chúng tôi.
-              </p>
-
-              <p>
-                Công ty Cổ phần đầu tư và phát triển thương mại Việt Phát thành lập từ ngày 11/11/2011 đến nay với 9 năm kinh nghiệm và phát triển, Việt Phát đã trở thành một nhịp cầu du học được nhiều học sinh và quý phụ huynh, đối tác tin tưởng. Nhờ sự tin cậy và tín nhiệm đó, công ty đã khẳng định vị thế và uy tín của mình trên thị trường tư vấn du học, mang lại nhiều hơn cơ hội thực hiện ước mơ du học của các bạn học sinh trên cả nước.
-              </p>
-
-              <p>
-                Tính đến nay Việt Phát đã có hàng ngàn du học sinh đã, đang và sắp sang Nhật Bản học tập tại các thành phố, tỉnh thành lớn như Tokyo, Osaka, Nagoya…, Seoul, Busan, Incheon,…
-              </p>
-
-              <p>
-                Cùng 7 chi nhánh, 20 văn phòng đại diện trên khắp các tỉnh thành trong nước, Việt Phát chúng tôi tự tin mang đến cho học sinh những cơ hội du học tốt nhất với sự hỗ trợ tận tình chu đáo, chi phí hợp lý nhất. Những đánh giá của học sinh và phụ huynh là thước đo quan trọng về chất lượng hoạt động dịch vụ của Công ty. Chúng tôi luôn ưu tiên hàng đầu việc học tập và chúng tôi biết rằng, học tập là con đường quan trọng để học sinh tích luỹ những kiến thức nền tảng làm cơ sở thực hiện ước mơ cũng như cho sự nghiệp phát triển sau này.
-              </p>
-
-              <p>
-                Với sự thấu hiểu trên, Công ty Cổ phần đầu tư và phát triển thương mại Việt Phát luôn là cầu nối uy tín và hiệu quả giữa các trường cao đẳng, đại học quốc tế với các bạn học sinh và phụ huynh. Giúp các bạn trẻ Việt Nam chạm tay tới ước mơ du học, được tiếp cận với những nền giáo dục chất lượng tiên tiến trên thế giới và được khẳng định bản thân mình.
-              </p>
-
-              <p>
-                Sẽ không quá lời khi nói rằng du học Nhật Bản, Hàn Quốc là một bước ngoặt ảnh hưởng lớn tới hướng đi trong cuộc đời của học sinh. Khoảng thời gian học tập tại Việt Phát là giai đoạn quan trọng chuẩn bị những kiến thức cơ bản để giúp học viên tìm kiếm con đường phù hợp cho tương lai.
-              </p>
-
-              <p className="italic text-gray-600 border-l-4 border-havico-blue pl-4 py-1">
-                Với phương châm hoạt động <strong>"Uy tín, tận tâm, trách nhiệm"</strong> —{' '}
-                <em>"Niềm tin của khách hàng tạo nên uy tín của công ty"</em>. Chúng tôi hướng đến là doanh nghiệp hàng đầu được khách hàng tin tưởng và lựa chọn.
-              </p>
-
-              <div className="pt-2">
-                <Link
-                  to="/tu-van"
-                  className="inline-block bg-havico-orange text-white text-sm font-bold px-6 py-2.5 hover:bg-orange-700 transition-colors uppercase tracking-wide"
-                >
-                  Liên hệ tư vấn
-                </Link>
+            {/* Nội dung do admin quản lý qua trang /admin */}
+            {cfg.about_text1 ? (
+              <div
+                className="text-sm text-gray-700 leading-relaxed about-rich-content"
+                dangerouslySetInnerHTML={{ __html: cfg.about_text1 }}
+              />
+            ) : (
+              <div className="text-sm text-gray-700 leading-relaxed space-y-4">
+                <p><strong>Kính gửi: Quý khách hàng</strong></p>
+                <p>Lời đầu tiên, Công ty cổ phần đầu tư và Phát triển Thương mại Việt Phát xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến quý khách hàng!</p>
+                <p>Công ty Cổ phần đầu tư và phát triển thương mại Việt Phát thành lập từ ngày 11/11/2011 đến nay với 9 năm kinh nghiệm và phát triển, Việt Phát đã trở thành một nhịp cầu du học được nhiều học sinh và quý phụ huynh, đối tác tin tưởng.</p>
+                <p>Tính đến nay Việt Phát đã có hàng ngàn du học sinh đã, đang và sắp sang Nhật Bản học tập tại các thành phố, tỉnh thành lớn như Tokyo, Osaka, Nagoya…, Seoul, Busan, Incheon,…</p>
+                <p>Cùng 7 chi nhánh, 20 văn phòng đại diện trên khắp các tỉnh thành trong nước, Việt Phát chúng tôi tự tin mang đến cho học sinh những cơ hội du học tốt nhất với sự hỗ trợ tận tình chu đáo, chi phí hợp lý nhất.</p>
+                <p className="italic text-gray-600 border-l-4 border-havico-blue pl-4 py-1">
+                  Với phương châm hoạt động <strong>"Uy tín, tận tâm, trách nhiệm"</strong> — <em>"Niềm tin của khách hàng tạo nên uy tín của công ty"</em>.
+                </p>
               </div>
+            )}
+
+            {cfg.about_text2 && (
+              <div
+                className="mt-4 text-sm text-gray-700 leading-relaxed about-rich-content"
+                dangerouslySetInnerHTML={{ __html: cfg.about_text2 }}
+              />
+            )}
+
+            <div className="mt-6">
+              <Link
+                to="/tu-van"
+                className="inline-block bg-havico-orange text-white text-sm font-bold px-6 py-2.5 hover:bg-orange-700 transition-colors uppercase tracking-wide"
+              >
+                Liên hệ tư vấn
+              </Link>
             </div>
 
             {/* Ảnh giấy chứng nhận */}

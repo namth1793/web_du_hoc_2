@@ -544,14 +544,12 @@ function GioiThieuPanel() {
             <ImageUpload value={cfg.about_thumbnail || ''} onChange={url => setCfg(c => ({ ...c, about_thumbnail: url }))} />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Đoạn văn 1</label>
-            <textarea value={cfg.about_text1 || ''} onChange={e => setCfg(c => ({ ...c, about_text1: e.target.value }))}
-              rows={3} className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue resize-none" />
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Nội dung giới thiệu (hiển thị trên trang Giới Thiệu)</label>
+            <RichEditor value={cfg.about_text1 || ''} onChange={val => setCfg(c => ({ ...c, about_text1: val }))} />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Đoạn văn 2</label>
-            <textarea value={cfg.about_text2 || ''} onChange={e => setCfg(c => ({ ...c, about_text2: e.target.value }))}
-              rows={3} className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-havico-blue resize-none" />
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Đoạn văn bổ sung</label>
+            <RichEditor value={cfg.about_text2 || ''} onChange={val => setCfg(c => ({ ...c, about_text2: val }))} />
           </div>
         </div>
       </section>

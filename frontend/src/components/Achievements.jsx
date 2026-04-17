@@ -28,15 +28,13 @@ const PROGRAMS = [
   { icon: '🏥', title: 'Tuyển sinh du học Điều dưỡng', sub: 'Chương trình điều dưỡng tại Nhật Bản' },
 ];
 
-const VISIBLE = 4;
-
-function SchoolCarousel({ schools }) {
+function SchoolCarouselInner({ schools, visible }) {
   const [index, setIndex] = useState(0);
   const [transitioning, setTransitioning] = useState(true);
 
-  // Clone first VISIBLE items to end for seamless loop
-  const items = [...schools, ...schools.slice(0, VISIBLE)];
-  const N = items.length; // e.g. 16
+  // Clone first `visible` items to end for seamless loop
+  const items = [...schools, ...schools.slice(0, visible)];
+  const N = items.length;
 
   const advance = useCallback(() => {
     setTransitioning(true);
@@ -58,7 +56,6 @@ function SchoolCarousel({ schools }) {
     }
   };
 
-  // track width = N/VISIBLE * 100% of container; translateX per card = 100%/N of track
   const translatePct = -(index * 100) / N;
 
   return (
@@ -67,7 +64,7 @@ function SchoolCarousel({ schools }) {
         onTransitionEnd={handleTransitionEnd}
         style={{
           display: 'flex',
-          width: `${(N / VISIBLE) * 100}%`,
+          width: `${(N / visible) * 100}%`,
           transform: `translateX(${translatePct}%)`,
           transition: transitioning ? 'transform 0.5s ease-in-out' : 'none',
         }}
@@ -94,6 +91,19 @@ function SchoolCarousel({ schools }) {
       </div>
     </div>
   );
+}
+
+function SchoolCarousel({ schools }) {
+  const getVisible = () => window.innerWidth < 640 ? 2 : 4;
+  const [visible, setVisible] = useState(getVisible);
+
+  useEffect(() => {
+    const handler = () => setVisible(getVisible());
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
+  return <SchoolCarouselInner schools={schools} visible={visible} key={visible} />;
 }
 
 export default function Achievements() {

@@ -681,8 +681,8 @@ app.post('/api/admin/articles', authAdmin, (req, res) => {
 });
 
 app.put('/api/admin/articles/:id', authAdmin, (req, res) => {
-  const { title, section, subcategory, cover_image, excerpt, content, is_published } = req.body;
-  db.prepare('UPDATE articles SET title=?,section=?,subcategory=?,cover_image=?,excerpt=?,content=?,is_published=? WHERE id=?').run(title, section, subcategory, cover_image || '', excerpt || '', content || '', is_published ?? 1, req.params.id);
+  const { title, section, subcategory, cover_image, excerpt, content, is_published, published_at } = req.body;
+  db.prepare('UPDATE articles SET title=?,section=?,subcategory=?,cover_image=?,excerpt=?,content=?,is_published=?,published_at=? WHERE id=?').run(title, section, subcategory, cover_image || '', excerpt || '', content || '', is_published ?? 1, published_at || null, req.params.id);
   res.json({ ok: true });
 });
 
