@@ -20,7 +20,7 @@ export default function EventsGrid() {
   }, []);
 
   const featured = events.slice(0, 3);
-  const small = [...events.slice(3), ...news].slice(0, 9);
+  const small = [...events.slice(3), ...news].slice(0, 6);
 
   return (
     <section className="py-8 bg-white border-t border-gray-100">
