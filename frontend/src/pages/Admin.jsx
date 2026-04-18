@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -1064,6 +1064,55 @@ function ContactsPanel({ contacts }) {
   );
 }
 
+// ─── Backup / Restore ────────────────────────────────────────────────────────
+function BackupRestore() {
+  const [restoring, setRestoring] = useState(false);
+  const [msg, setMsg] = useState('');
+  const fileRef = useRef(null);
+
+  const download = async () => {
+    try {
+      const res = await axios.get('/api/admin/backup', { ...AUTH, responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `havico-backup-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch { setMsg('Backup thất bại'); setTimeout(() => setMsg(''), 3000); }
+  };
+
+  const restore = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!window.confirm('Restore sẽ ghi đè toàn bộ dữ liệu hiện tại. Tiếp tục?')) return;
+    setRestoring(true); setMsg('');
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      await axios.post('/api/admin/restore', data, AUTH);
+      setMsg('✓ Restore thành công! Tải lại trang để thấy dữ liệu mới.');
+    } catch { setMsg('✗ Restore thất bại — file không hợp lệ.'); }
+    finally { setRestoring(false); e.target.value = ''; setTimeout(() => setMsg(''), 5000); }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      {msg && <span className={`text-xs font-medium ${msg.startsWith('✓') ? 'text-green-300' : 'text-red-300'}`}>{msg}</span>}
+      <button onClick={download}
+        title="Tải backup toàn bộ dữ liệu (JSON)"
+        className="text-white/70 hover:text-white text-xs flex items-center gap-1 border border-white/20 px-2 py-1 hover:border-white/50 transition-colors">
+        ⬇ Backup
+      </button>
+      <label title="Restore từ file backup JSON"
+        className={`text-xs flex items-center gap-1 border px-2 py-1 transition-colors cursor-pointer ${restoring ? 'text-white/40 border-white/10 cursor-not-allowed' : 'text-white/70 hover:text-white border-white/20 hover:border-white/50'}`}>
+        {restoring ? '⏳ Đang restore...' : '⬆ Restore'}
+        <input type="file" accept=".json" className="hidden" disabled={restoring} onChange={restore} ref={fileRef} />
+      </label>
+    </div>
+  );
+}
+
 // ─── Main Admin ──────────────────────────────────────────────────────────────
 export default function Admin() {
   const [authed, setAuthed] = useState(false);
@@ -1101,12 +1150,15 @@ export default function Admin() {
             <span className="bg-white/20 text-xs font-bold px-2 py-0.5">Admin</span>
           </div>
         </div>
-        <a href="/" className="text-white/70 hover:text-white text-xs flex items-center gap-1">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-          </svg>
-          Về trang chủ
-        </a>
+        <div className="flex items-center gap-3">
+          <BackupRestore />
+          <a href="/" className="text-white/70 hover:text-white text-xs flex items-center gap-1">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Về trang chủ
+          </a>
+        </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">

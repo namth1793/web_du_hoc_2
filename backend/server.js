@@ -28,7 +28,8 @@ const PORT = process.env.PORT || 5020;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dataDir = path.join(__dirname, 'data');
+// DATA_DIR env var cho phép Railway Volume mount vào đây
+const dataDir = process.env.DATA_DIR || path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 const db = new Database(path.join(dataDir, 'havico.db'));
@@ -785,6 +786,55 @@ app.put('/api/admin/schools/:id', authAdmin, (req, res) => {
       JSON.stringify(courses||[]), JSON.stringify(highlights||[]),
       JSON.stringify(cert_images||[]), sort_order||0, req.params.id);
   res.json({ ok: true });
+});
+
+// ─── BACKUP / RESTORE ────────────────────────────────────────────────────────
+// GET /api/admin/backup  → download toàn bộ data dưới dạng JSON
+app.get('/api/admin/backup', authAdmin, (req, res) => {
+  const backup = {
+    exportedAt: new Date().toISOString(),
+    articles:     db.prepare('SELECT * FROM articles').all(),
+    contacts:     db.prepare('SELECT * FROM contacts').all(),
+    testimonials: db.prepare('SELECT * FROM testimonials').all(),
+    schools:      db.prepare('SELECT * FROM schools').all(),
+    settings:     db.prepare('SELECT * FROM site_settings').all(),
+  };
+  res.setHeader('Content-Disposition', `attachment; filename="havico-backup-${Date.now()}.json"`);
+  res.setHeader('Content-Type', 'application/json');
+  res.json(backup);
+});
+
+// POST /api/admin/restore  → restore từ JSON backup
+app.post('/api/admin/restore', authAdmin, (req, res) => {
+  const { articles, contacts, testimonials, schools, settings } = req.body;
+  const run = db.transaction(() => {
+    if (Array.isArray(articles) && articles.length) {
+      db.prepare('DELETE FROM articles').run();
+      const ins = db.prepare('INSERT INTO articles (id,title,section,subcategory,cover_image,excerpt,content,author,published_at,is_published) VALUES (?,?,?,?,?,?,?,?,?,?)');
+      articles.forEach(a => ins.run(a.id,a.title,a.section,a.subcategory,a.cover_image||'',a.excerpt||'',a.content||'',a.author||'Ban biên tập Việt Phát VTI',a.published_at,a.is_published??1));
+    }
+    if (Array.isArray(contacts) && contacts.length) {
+      db.prepare('DELETE FROM contacts').run();
+      const ins = db.prepare('INSERT INTO contacts (id,name,phone,email,province,message,created_at) VALUES (?,?,?,?,?,?,?)');
+      contacts.forEach(c => ins.run(c.id,c.name,c.phone,c.email||'',c.province||'',c.message||'',c.created_at));
+    }
+    if (Array.isArray(testimonials) && testimonials.length) {
+      db.prepare('DELETE FROM testimonials').run();
+      const ins = db.prepare('INSERT INTO testimonials (id,name,role,avatar,country,content,sort_order,is_published) VALUES (?,?,?,?,?,?,?,?)');
+      testimonials.forEach(t => ins.run(t.id,t.name,t.role||'',t.avatar||'',t.country||'',t.content,t.sort_order||0,t.is_published??1));
+    }
+    if (Array.isArray(schools) && schools.length) {
+      db.prepare('DELETE FROM schools').run();
+      const ins = db.prepare('INSERT INTO schools (id,slug,name,short_name,country,city,img,founded,addresses,intro,tuition_note,tuition_rows,admission,courses,highlights,cert_images,sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+      schools.forEach(s => ins.run(s.id,s.slug,s.name,s.short_name||'',s.country||'',s.city||'',s.img||'',s.founded||null,s.addresses||'[]',s.intro||'[]',s.tuition_note||'',s.tuition_rows||'[]',s.admission||'[]',s.courses||'[]',s.highlights||'[]',s.cert_images||'[]',s.sort_order||0));
+    }
+    if (Array.isArray(settings) && settings.length) {
+      const ups = db.prepare('INSERT INTO site_settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value');
+      settings.forEach(s => ups.run(s.key, s.value));
+    }
+  });
+  try { run(); res.json({ ok: true }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ─── START ─────────────────────────────────────────────────────────────────────
