@@ -48,7 +48,7 @@ export default function Hero() {
   if (slides.length === 0) return null;
 
   return (
-    <div className="relative w-full overflow-hidden select-none h-[300px] sm:h-[380px] md:h-[460px] lg:h-[620px]">
+    <div className="relative w-full overflow-hidden select-none aspect-[1024/560]">
       <div
         className="flex h-full"
         style={{
