@@ -49,7 +49,7 @@ export default function CountryCards() {
                 />
               </div>
               <Link to={`/du-hoc/${c.slug}`}
-                className="inline-block bg-havico-blue text-white text-xs font-bold px-8 py-2 uppercase tracking-wide hover:bg-blue-700 transition-colors">
+                className="flex items-center justify-center w-full h-10 bg-havico-blue text-white text-xs font-bold px-4 uppercase tracking-wide hover:bg-blue-700 transition-colors">
                 {c.name}
               </Link>
             </div>

@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
 import axios from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const DEFAULT_SLIDES = [
   { src: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1920&q=80', label: '🇯🇵 Du học Nhật Bản', bg: '#1565C0' },
@@ -48,7 +48,7 @@ export default function Hero() {
   if (slides.length === 0) return null;
 
   return (
-    <div className="relative w-full overflow-hidden select-none h-[200px] sm:h-[280px] md:h-[360px] lg:h-[420px]">
+    <div className="relative w-full overflow-hidden select-none h-[300px] sm:h-[380px] md:h-[460px] lg:h-[620px]">
       <div
         className="flex h-full"
         style={{
