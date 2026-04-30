@@ -110,22 +110,25 @@ export default function Contact() {
               <div className="space-y-4 text-xs">
                 <div>
                   <p className="text-gold font-bold uppercase mb-1">Trụ sở chính</p>
-                  <p className="text-gray-300">Số 48, ngách 2, ngõ Sim Co, đường Phạm Hùng, phường Mỹ Đình 1, quận Nam Từ Liêm, Hà Nội</p>
+                  <p className="text-gray-300">Toà Intracom - Số 33 Cầu Diễn - Hà Nội</p>
                 </div>
                 <div className="border-t border-white/10 pt-3">
-                  <p className="text-gold font-bold uppercase mb-1">Văn phòng</p>
-                  <p className="text-gray-300">Tầng 14, tòa nhà Intracom, 33 Cầu Diễn, phường Phúc Diễn, quận Bắc Từ Liêm, Hà Nội</p>
+                  <p className="text-gold font-bold uppercase mb-1">Trung tâm Đào tạo 1</p>
+                  <p className="text-gray-300">Tân Tây Đô - Hà Nội</p>
                 </div>
                 <div className="border-t border-white/10 pt-3">
-                  <p className="text-gold font-bold uppercase mb-1">Điện thoại</p>
-                  <p><a href="tel:0918738386" className="text-gray-300 hover:text-gold">📞 0918 73 83 86 (Mr Tài)</a></p>
-                  <p><a href="tel:0971074966" className="text-gray-300 hover:text-gold">📞 0971 074 966 (Mr Đình)</a></p>
-                  <p><a href="tel:02437878417" className="text-gray-300 hover:text-gold">☎ 0243 78 78 417 / 0243 7878 416</a></p>
+                  <p className="text-gold font-bold uppercase mb-1">Trung tâm Đào tạo 2 – Bắc Ninh</p>
+                  <p className="text-gray-300">Phòng Hợp tác Quốc tế - Trường Cao Đẳng Viglacera - Tam Đa - Khu Đô Thị Yên Phong - Tỉnh Bắc Ninh</p>
                 </div>
                 <div className="border-t border-white/10 pt-3">
-                  <p className="text-gold font-bold uppercase mb-1">Email</p>
-                  <p><a href="mailto:vietphatvti@gmail.com" className="text-gray-300 hover:text-gold">vietphatvti@gmail.com</a></p>
-                  <p><a href="mailto:dinhcaovti@gmail.com" className="text-gray-300 hover:text-gold">dinhcaovti@gmail.com</a></p>
+                  <p className="text-gold font-bold uppercase mb-1">Hotline</p>
+                  <p><a href="tel:0977272963" className="text-gray-300 hover:text-gold">📞 0977.272.963</a></p>
+                  <p><a href="tel:0978762998" className="text-gray-300 hover:text-gold">📞 0978.762.998</a></p>
+                </div>
+                <div className="border-t border-white/10 pt-3">
+                  <p className="text-gold font-bold uppercase mb-1">Mạng xã hội</p>
+                  <p><a href="https://www.facebook.com/duhocvti" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-gold">📘 facebook.com/duhocvti</a></p>
+                  <p><a href="https://zalo.me/0977272963" target="_blank" rel="noreferrer" className="text-gray-300 hover:text-gold">💬 Zalo: 0977.272.963</a></p>
                 </div>
               </div>
             </div>
@@ -167,7 +170,7 @@ export default function Contact() {
               <div className="text-2xl mb-2">🔖</div>
               <p className="text-xs font-semibold text-navy-900 mb-1">Tư vấn trực tiếp qua Zalo</p>
               <p className="text-xs text-gray-500">Nhắn tin ngay để được hỗ trợ nhanh nhất</p>
-              <a href="https://zalo.me" target="_blank" rel="noreferrer"
+              <a href="https://zalo.me/0977272963" target="_blank" rel="noreferrer"
                 className="mt-3 inline-block bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-blue-600 transition-colors">
                 Mở Zalo
               </a>

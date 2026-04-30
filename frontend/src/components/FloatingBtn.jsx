@@ -53,7 +53,7 @@ export default function FloatingBtn() {
         <div className="relative">
           <div className="pulse-ring-zalo" />
           <a
-            href="https://zalo.me/0918738386"
+            href="https://zalo.me/0977272963"
             target="_blank"
             rel="noreferrer"
             className="btn-zalo relative bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-blue-600 transition-colors"
@@ -68,9 +68,9 @@ export default function FloatingBtn() {
           <div className="pulse-ring" />
           <div className="pulse-ring-2" />
           <a
-            href="tel:0918738386"
+            href="tel:0977272963"
             className="btn-phone relative bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-green-600 transition-colors"
-            title="Gọi 0918 73 83 86"
+            title="Gọi 0977.272.963"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

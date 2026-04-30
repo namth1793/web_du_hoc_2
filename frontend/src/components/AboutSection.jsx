@@ -6,31 +6,31 @@ import intro2 from '../../assets/intro/intro2.jpg';
 import intro3 from '../../assets/intro/intro3.jpg';
 
 const BRANCHES = [
-  { stt: 1,  type: 'cn',   name: 'Công Ty CP Đầu Tư và Phát Triển Thương Mại Việt Phát',                                          phone: '',              contact: 'Nguyễn Văn Tài',        fanpage: '' },
-  { stt: 2,  type: 'vpdd', name: 'VPĐD tại Vĩnh Phúc',                                                                             phone: '',              contact: 'Phan Thị Thanh Vân',    fanpage: '' },
-  { stt: 3,  type: 'vpdd', name: 'VPĐD tại Nam Định',                                                                               phone: '0984 740 540',  contact: '',                      fanpage: 'https://www.facebook.com/DuHocLaoDongKySuNhatBan' },
-  { stt: 4,  type: 'vpdd', name: 'VPĐD tại Thanh Hóa',                                                                              phone: '',              contact: 'Nguyễn Văn Lâm',        fanpage: '' },
-  { stt: 5,  type: 'vpdd', name: 'VPĐD tại Hải Phòng',                                                                              phone: '',              contact: 'Nguyễn Duy Giang',      fanpage: '' },
-  { stt: 6,  type: 'vpdd', name: 'VPĐD tại Thái Bình',                                                                              phone: '',              contact: 'Nguyễn Đức Quang',      fanpage: '' },
-  { stt: 7,  type: 'vpdd', name: 'VPĐD số 2 tại Phú Thọ',                                                                          phone: '',              contact: 'Nguyễn Đức Quang',      fanpage: '' },
-  { stt: 8,  type: 'vpdd', name: 'VPĐD tại Đồng Nai',                                                                              phone: '',              contact: 'Dương Đình Cương',      fanpage: '' },
-  { stt: 9,  type: 'vpdd', name: 'VPĐD tại Quảng Trị',                                                                             phone: '',              contact: 'Nguyễn Đăng Diệu',      fanpage: '' },
-  { stt: 10, type: 'cn',   name: 'Chi nhánh tại Sơn La',                                                                           phone: '',              contact: 'Lê Anh Cương',          fanpage: '' },
-  { stt: 11, type: 'cn',   name: 'Chi nhánh tại Hà Nam',                                                                           phone: '',              contact: 'Đỗ Hữu Thắng',          fanpage: '' },
-  { stt: 12, type: 'cn',   name: 'Chi nhánh tại Lai Châu',                                                                         phone: '',              contact: 'Cung Văn Tân',          fanpage: '' },
-  { stt: 13, type: 'cn',   name: 'Chi nhánh tại Lạng Sơn',                                                                         phone: '0966 344 299',  contact: '',                      fanpage: 'https://www.facebook.com/duhocvietphatlangson' },
-  { stt: 14, type: 'vpdd', name: 'VPĐD tại Sơn Tây',                                                                               phone: '',              contact: 'Nguyễn Thị Thanh',      fanpage: '' },
-  { stt: 15, type: 'cn',   name: 'Chi nhánh tại Quảng Bình',                                                                       phone: '',              contact: 'Lê Quang Hai',          fanpage: '' },
-  { stt: 16, type: 'vpdd', name: 'VPĐD tại Thái Nguyên',                                                                           phone: '',              contact: 'Nguyễn Thị Điệp',       fanpage: '' },
-  { stt: 17, type: 'vpdd', name: 'VPĐD tại Lạng Giang – Bắc Giang',                                                               phone: '',              contact: 'Nguyễn Văn Ánh',        fanpage: '' },
-  { stt: 18, type: 'cn',   name: 'Chi nhánh tại Phú Thọ',                                                                          phone: '',              contact: 'Đinh Văn Quân',         fanpage: '' },
-  { stt: 19, type: 'vpdd', name: 'VPĐD tại Bà Rịa – Vũng Tàu',                                                                    phone: '',              contact: 'Dương Đình Cương',      fanpage: '' },
-  { stt: 20, type: 'vpdd', name: 'VPĐD tại Bình Phước',                                                                            phone: '',              contact: 'Bùi Văn Phương',        fanpage: '' },
-  { stt: 21, type: 'vpdd', name: 'VPĐD tại Đắk Lắk',                                                                               phone: '',              contact: 'Nguyễn Thị Thu Hiền',   fanpage: '' },
-  { stt: 22, type: 'vpdd', name: 'VPĐD tại Nghệ An',                                                                               phone: '',              contact: 'Cao Văn Công',          fanpage: '' },
-  { stt: 23, type: 'vpdd', name: 'VPĐD tại TP. Hồ Chí Minh',                                                                      phone: '',              contact: 'Phan Xuân Nghị',        fanpage: '' },
-  { stt: 24, type: 'vpdd', name: 'VPĐD tại Bến Tre',                                                                               phone: '',              contact: 'Nguyễn Văn Mững',       fanpage: '' },
-  { stt: 25, type: 'vpdd', name: 'VPĐD tại Lâm Đồng',                                                                              phone: '',              contact: 'Nguyễn Văn Mững',       fanpage: '' },
+  { stt: 1,  type: 'cn',   name: 'Công Ty CP Đầu Tư và Phát Triển Thương Mại Việt Phát',  contact: 'Nguyễn Văn Tài' },
+  { stt: 2,  type: 'vpdd', name: 'VPĐD tại Vĩnh Phúc',                                    contact: 'Phan Thị Thanh Vân' },
+  { stt: 3,  type: 'vpdd', name: 'VPĐD tại Nam Định',                                      contact: '' },
+  { stt: 4,  type: 'vpdd', name: 'VPĐD tại Thanh Hóa',                                     contact: 'Nguyễn Văn Lâm' },
+  { stt: 5,  type: 'vpdd', name: 'VPĐD tại Hải Phòng',                                     contact: 'Nguyễn Duy Giang' },
+  { stt: 6,  type: 'vpdd', name: 'VPĐD tại Thái Bình',                                     contact: 'Nguyễn Đức Quang' },
+  { stt: 7,  type: 'vpdd', name: 'VPĐD số 2 tại Phú Thọ',                                  contact: 'Nguyễn Đức Quang' },
+  { stt: 8,  type: 'vpdd', name: 'VPĐD tại Đồng Nai',                                      contact: 'Dương Đình Cương' },
+  { stt: 9,  type: 'vpdd', name: 'VPĐD tại Quảng Trị',                                     contact: 'Nguyễn Đăng Diệu' },
+  { stt: 10, type: 'cn',   name: 'Chi nhánh tại Sơn La',                                   contact: 'Lê Anh Cương' },
+  { stt: 11, type: 'cn',   name: 'Chi nhánh tại Hà Nam',                                   contact: 'Đỗ Hữu Thắng' },
+  { stt: 12, type: 'cn',   name: 'Chi nhánh tại Lai Châu',                                 contact: 'Cung Văn Tân' },
+  { stt: 13, type: 'cn',   name: 'Chi nhánh tại Lạng Sơn',                                 contact: '' },
+  { stt: 14, type: 'vpdd', name: 'VPĐD tại Sơn Tây',                                       contact: 'Nguyễn Thị Thanh' },
+  { stt: 15, type: 'cn',   name: 'Chi nhánh tại Quảng Bình',                               contact: 'Lê Quang Hai' },
+  { stt: 16, type: 'vpdd', name: 'VPĐD tại Thái Nguyên',                                   contact: 'Nguyễn Thị Điệp' },
+  { stt: 17, type: 'vpdd', name: 'VPĐD tại Lạng Giang – Bắc Giang',                       contact: 'Nguyễn Văn Ánh' },
+  { stt: 18, type: 'cn',   name: 'Chi nhánh tại Phú Thọ',                                  contact: 'Đinh Văn Quân' },
+  { stt: 19, type: 'vpdd', name: 'VPĐD tại Bà Rịa – Vũng Tàu',                            contact: 'Dương Đình Cương' },
+  { stt: 20, type: 'vpdd', name: 'VPĐD tại Bình Phước',                                    contact: 'Bùi Văn Phương' },
+  { stt: 21, type: 'vpdd', name: 'VPĐD tại Đắk Lắk',                                      contact: 'Nguyễn Thị Thu Hiền' },
+  { stt: 22, type: 'vpdd', name: 'VPĐD tại Nghệ An',                                       contact: 'Cao Văn Công' },
+  { stt: 23, type: 'vpdd', name: 'VPĐD tại TP. Hồ Chí Minh',                              contact: 'Phan Xuân Nghị' },
+  { stt: 24, type: 'vpdd', name: 'VPĐD tại Bến Tre',                                       contact: 'Nguyễn Văn Mững' },
+  { stt: 25, type: 'vpdd', name: 'VPĐD tại Lâm Đồng',                                     contact: 'Nguyễn Văn Mững' },
 ];
 
 export default function AboutSection() {
@@ -150,8 +150,7 @@ export default function AboutSection() {
                     <th className="px-3 py-2.5 font-semibold w-10 text-center">STT</th>
                     <th className="px-3 py-2.5 font-semibold">Tên chi nhánh / VPĐD</th>
                     <th className="px-3 py-2.5 font-semibold w-32">Loại</th>
-                    <th className="px-3 py-2.5 font-semibold w-36">Điện thoại / Liên hệ</th>
-                    <th className="px-3 py-2.5 font-semibold w-32">Fanpage</th>
+                    <th className="px-3 py-2.5 font-semibold w-44">Giám đốc / Phụ trách</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -169,24 +168,7 @@ export default function AboutSection() {
                         </span>
                       </td>
                       <td className="px-3 py-2.5 text-gray-600 text-xs">
-                        {b.phone
-                          ? <a href={`tel:${b.phone.replace(/\s/g, '')}`} className="text-havico-blue hover:underline font-medium">{b.phone}</a>
-                          : b.contact
-                            ? <span>{b.contact}</span>
-                            : <span className="text-gray-400">—</span>
-                        }
-                      </td>
-                      <td className="px-3 py-2.5 text-xs">
-                        {b.fanpage
-                          ? <a href={b.fanpage} target="_blank" rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline flex items-center gap-1">
-                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                              </svg>
-                              Facebook
-                            </a>
-                          : <span className="text-gray-400">—</span>
-                        }
+                        {b.contact ? <span>{b.contact}</span> : <span className="text-gray-400">—</span>}
                       </td>
                     </tr>
                   ))}

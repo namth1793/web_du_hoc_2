@@ -83,7 +83,7 @@ export default function Navbar() {
         {mobileOpen && (
           <div className="lg:hidden bg-blue-800 border-t border-blue-700 px-4 py-3 space-y-1">
             <div className="text-xs text-blue-200 py-2 border-b border-blue-700 mb-2">
-              📞 0918 73 83 86 (Mr Tài) &nbsp;|&nbsp; 0971 074 966 (Mr Đình)
+              📞 0977.272.963 &nbsp;|&nbsp; 0978.762.998
             </div>
             {NAV_ITEMS.map((item, i) => (
               <Link key={i} to={item.href} onClick={() => setMobileOpen(false)}

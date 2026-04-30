@@ -50,23 +50,24 @@ export default function Footer() {
             <ul className="space-y-2 text-xs text-gray-400">
               <li className="flex items-start gap-1.5">
                 <span className="flex-shrink-0 mt-0.5">📍</span>
-                <span>Số 48, ngách 2, ngõ Sim Co, đường Phạm Hùng, Mỹ Đình 1, Nam Từ Liêm, Hà Nội</span>
+                <span>Trụ sở chính: Toà Intracom - Số 33 Cầu Diễn - Hà Nội</span>
               </li>
               <li className="flex items-start gap-1.5">
-                <span className="flex-shrink-0">📍</span>
-                <span>Tầng 14, tòa nhà Intracom, 33 Cầu Diễn, Phúc Diễn, Bắc Từ Liêm, Hà Nội</span>
+                <span className="flex-shrink-0 mt-0.5">📍</span>
+                <span>Trung tâm Đào tạo 1: Tân Tây Đô - Hà Nội</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <span className="flex-shrink-0 mt-0.5">📍</span>
+                <span>Trung tâm Đào tạo 2 tại Bắc Ninh: Phòng Hợp tác Quốc tế - Trường Cao Đẳng Viglacera - Tam Đa - Khu Đô Thị Yên Phong - Tỉnh Bắc Ninh</span>
               </li>
               <li>
-                <a href="tel:02437878417" className="hover:text-white">☎ 0243 78 78 417 / 0243 7878 416</a>
+                <a href="tel:0977272963" className="hover:text-white">📞 0977.272.963 - 0978.762.998</a>
               </li>
               <li>
-                <a href="tel:0918738386" className="hover:text-white">📞 0918 73 83 86 (Mr Tài)</a>
+                <a href="https://www.facebook.com/duhocvti" target="_blank" rel="noreferrer" className="hover:text-white">📘 facebook.com/duhocvti</a>
               </li>
               <li>
-                <a href="tel:0971074966" className="hover:text-white">📞 0971 074 966 (Mr Đình)</a>
-              </li>
-              <li>
-                <a href="mailto:vietphatvti@gmail.com" className="hover:text-white">✉ vietphatvti@gmail.com</a>
+                <a href="https://zalo.me/0977272963" target="_blank" rel="noreferrer" className="hover:text-white">💬 Zalo: 0977.272.963</a>
               </li>
             </ul>
           </div>
